@@ -25,6 +25,9 @@ import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import { Icon } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import VueAnalytics from 'vue-analytics'
+
+import 'bootstrap'
+import 'bootstrap/dist/css/bootstrap.min.css'
 // import Vuex from 'vuex'
 // import ReactiveSearch from '@appbaseio/reactivesearch-vue'
 

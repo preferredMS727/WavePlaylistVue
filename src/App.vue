@@ -35,6 +35,7 @@
                 <router-view/>
               </v-card-text>
             </v-card>
+            <!-- <WavePlaylist></WavePlaylist> -->
 
       </v-container>
     </v-content>
@@ -44,6 +45,7 @@
 
 <script>
 import NavigationDrawer from '@/components/NavigationDrawer'
+// import WavePlaylist from './components/WavePlaylist'
 
 export default {
   name: 'app',
@@ -52,6 +54,7 @@ export default {
   },
   components: {
     NavigationDrawer
+    // WavePlaylist
   },
   methods: {
     jumpToLang (langcode) {
