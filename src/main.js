@@ -28,6 +28,11 @@ import VueAnalytics from 'vue-analytics'
 
 import 'bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
+
+import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue'
+
+Vue.use(BootstrapVue)
+Vue.use(BootstrapVueIcons)
 // import Vuex from 'vuex'
 // import ReactiveSearch from '@appbaseio/reactivesearch-vue'
 

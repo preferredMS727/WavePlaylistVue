@@ -23,6 +23,7 @@
     "apollo-link-http": "^1.5.16",
     "axios": "^0.17.1",
     "bootstrap": "^4.4.1",
+    "bootstrap-vue": "^2.9.0",
     "event-emitter": "^0.3.5",
     "fs": "0.0.1-security",
     "graphql": "^14.5.7",

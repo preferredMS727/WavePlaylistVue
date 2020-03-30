@@ -3,9 +3,15 @@
       <div id="top-bar" class="playlist-top-bar">
         <div class="playlist-toolbar">
           <div class="btn-group">
-            <span class="btn-pause btn btn-warning" v-on:click="pause"><i class="fa fa-pause">Pause</i></span>
-            <span class="btn-play btn btn-success" v-on:click="start"><i class="fa fa-play">Start</i></span>
-            <span class="btn-stop btn btn-danger" v-on:click="stop"><i class="fa fa-stop">Stop</i></span>
+            <span class="btn-pause btn btn-warning" v-on:click="pause">
+              <b-icon icon="pause-fill"></b-icon>
+            </span>
+            <span class="btn-play btn btn-success" v-on:click="start">
+              <b-icon icon="play-fill"></b-icon>
+            </span>
+            <span class="btn-stop btn btn-danger" v-on:click="stop">
+              <b-icon icon="stop-fill"></b-icon>
+            </span>
           </div>
         </div>
       </div>
@@ -17,14 +23,41 @@
   var ee = null
   export default {
     name: 'wave-playlist',
-    mounted: function () {
+    data: function () {
+      return {
+        duration: 0,
+        tracks: [
+          {
+            mp3: '/media/audio/track1.mp3',
+            img: '/media/img/track1.jpg',
+            name: 'Vocals1'
+          },
+          {
+            mp3: '/media/audio/track2.mp3',
+            img: '/media/img/track2.jpg',
+            name: 'Vocals2'
+          }
+        ]
+      }
+    },
+    mounted: async function () {
+      var mp3file = this.tracks[0].mp3
+
+      window.OfflineAudioContext = window.OfflineAudioContext || window.webkitOfflineAudioContext
+      window.AudioContext = window.AudioContext || window.webkitAudioContext
+      var audioContext = new window.AudioContext()
+      let sampleRate = audioContext.sampleRate
+
+      this.duration = await this.getMp3Secs(mp3file)
+      let customSamplesPerPixel = Math.ceil(this.duration * sampleRate / (6515 - 100))
+      console.log('duration: ', customSamplesPerPixel)
+
       var WaveformPlaylist = require('waveform-playlist')
       var playlist = WaveformPlaylist.init(
         {
-          samplesPerPixel: 899,
-          // ac: new (window.AudioContext || window.webkitAudioContext),
-          // // sample rate of the project. (used for correct peaks rendering)
-          // sampleRate: new (window.AudioContext || window.webkitAudioContext).sampleRate,
+          samplesPerPixel: customSamplesPerPixel,
+          ac: audioContext,
+          sampleRate: sampleRate,
           mono: true,
           timescale: true,
           waveHeight: 200,
@@ -39,12 +72,11 @@
             show: true,
             width: 200
           },
-          zoomLevels: [512, 899, 1024, 2048, 4096],
+          zoomLevels: [512, customSamplesPerPixel, 1024, 2048, 4096],
           seekStyle: 'fill',
           isAutomaticScroll: true,
           isContinuousPlay: true
         }
-        // EventEmitter()
       )
 
       ee = playlist.getEventEmitter()
@@ -55,41 +87,26 @@
       playlist
         .load([
           {
-            src: 'media/audio/track1.mp3',
-            name: 'Vocals',
-            // cuein: 2,
+            src: this.tracks[0].mp3,
+            name: this.tracks[0].name,
             selected: {
               start: 2
             },
             start: 2
-            // fadeIn: {
-            //   shape: "logarithmic",
-            //   duration: 0.75
-            // },
-            // fadeOut: {
-            //   shape: "logarithmic",
-            //   duration: 1.5
-            // }
           },
           {
-            src: 'media/audio/track2.mp3',
-            name: 'Vocals',
+            src: this.tracks[1].mp3,
+            name: this.tracks[1].name,
             selected: {
               start: 2
             },
             start: 2
           }
         ])
-        .then(function () {
-          // can do stuff with the playlist.
-          // const el = document.getElementsByClassName('waveform')
-          // console.log('main: ', el[0])
-          // el[0].classList.add('bg-waveform')
-          const playlistOverplay = document.getElementsByClassName('playlist-overlay')
-          // background-image: url(/media/img/track1.jpg);
-          playlistOverplay[0].style.backgroundImage = "url('/media/img/track1.jpg')"
-          playlistOverplay[1].style.backgroundImage = "url('/media/img/track2.jpg')"
-        })
+        .then(this.loadedCallback)
+    },
+    beforeDestroy: function () {
+      console.log('this is befroe destroy!')
     },
     methods: {
       pause: () => {
@@ -103,14 +120,31 @@
       stop: () => {
         console.log('this is stop!')
         ee.emit('stop')
+      },
+      getMp3Secs: (mp3file) => {
+        return new Promise((resolve, reject) => {
+          var audioContext = new (window.AudioContext || window.webkitAudioContext)()
+          var request = new XMLHttpRequest()
+          request.open('GET', mp3file, true)
+          request.responseType = 'arraybuffer'
+          request.onload = function () {
+            audioContext.decodeAudioData(request.response, function (buffer) {
+              this.duration = buffer.duration
+              resolve(buffer.duration)
+            })
+          }
+          request.send()
+        })
+      },
+      loadedCallback: function () {
+        const playlistOverplays = document.getElementsByClassName('playlist-overlay')
+        Object.keys(playlistOverplays).forEach((key) => {
+          playlistOverplays[key].style.backgroundImage = "url('" + this.tracks[key].img + "')"
+        })
       }
     }
   }
 </script>
 
 <style lang='scss' scoped>
-  // @import '../assets/styles/playlist.scss';
-  .bg-waveform {
-    background-color: red;
-  }
 </style>
