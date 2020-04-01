@@ -37,23 +37,23 @@
             img: '/media/img/track2.jpg',
             name: 'Vocals2'
           }
-        ]
+        ],
+        startTime: 2,
+        trackWidth: 6857 - 171 * 2
       }
     },
     mounted: async function () {
-      var mp3file = this.tracks[0].mp3
-
       window.OfflineAudioContext = window.OfflineAudioContext || window.webkitOfflineAudioContext
       window.AudioContext = window.AudioContext || window.webkitAudioContext
-      var audioContext = new window.AudioContext()
+      let audioContext = new window.AudioContext()
       let sampleRate = audioContext.sampleRate
 
-      this.duration = await this.getMp3Secs(mp3file)
-      let customSamplesPerPixel = Math.ceil(this.duration * sampleRate / (6515 - 100))
-      console.log('duration: ', customSamplesPerPixel)
+      this.duration = await this.getMp3Secs(this.tracks[0].mp3, this.startTime)
+      let customSamplesPerPixel = Math.round(this.duration * sampleRate / this.trackWidth)
+      console.log('duration: ', this.duration)
 
-      var WaveformPlaylist = require('waveform-playlist')
-      var playlist = WaveformPlaylist.init(
+      let WaveformPlaylist = require('waveform-playlist')
+      let playlist = WaveformPlaylist.init(
         {
           samplesPerPixel: customSamplesPerPixel,
           ac: audioContext,
@@ -90,17 +90,17 @@
             src: this.tracks[0].mp3,
             name: this.tracks[0].name,
             selected: {
-              start: 2
+              start: this.startTime
             },
-            start: 2
+            start: this.startTime
           },
           {
             src: this.tracks[1].mp3,
             name: this.tracks[1].name,
             selected: {
-              start: 2
+              start: this.startTime
             },
-            start: 2
+            start: this.startTime
           }
         ])
         .then(this.loadedCallback)
@@ -121,16 +121,15 @@
         console.log('this is stop!')
         ee.emit('stop')
       },
-      getMp3Secs: (mp3file) => {
+      getMp3Secs: (mp3file, startTime) => {
         return new Promise((resolve, reject) => {
-          var audioContext = new (window.AudioContext || window.webkitAudioContext)()
-          var request = new XMLHttpRequest()
+          let audioContext = new (window.AudioContext || window.webkitAudioContext)()
+          let request = new XMLHttpRequest()
           request.open('GET', mp3file, true)
           request.responseType = 'arraybuffer'
           request.onload = function () {
             audioContext.decodeAudioData(request.response, function (buffer) {
-              this.duration = buffer.duration
-              resolve(buffer.duration)
+              resolve(buffer.duration + startTime)
             })
           }
           request.send()
