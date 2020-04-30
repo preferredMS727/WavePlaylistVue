@@ -28,7 +28,7 @@
     "fs": "0.0.1-security",
     "graphql": "^14.5.7",
     "graphql-tag": "^2.10.1",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "leaflet": "^1.5.1",
     "lokalise": "0.0.5",
     "material-design-icons-iconfont": "^4.0.5",
